@@ -4,7 +4,7 @@
   "description": "Copy all assets referenced to a folder",
   "main": "index.js",
   "scripts": {
-    "test": "tap test.js"
+    "test": "node_modules/.bin/tap test.js"
   },
   "repository": {
     "type": "git",
