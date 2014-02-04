@@ -1,5 +1,7 @@
 # rework-assets
 
+[![Build Status](https://drone.io/github.com/conradz/rework-assets/status.png)](https://drone.io/github.com/conradz/rework-assets/latest)
+
 Copy all assets referenced by the CSS document to a folder, updating the CSS
 references.
 
