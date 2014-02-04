@@ -37,6 +37,10 @@ Returns a new rework plugin function that will copy all the assets referenced by
  * `outputUrl`: The URL that is used to reference the output directory from the
    generated CSS.  Defaults to the value of `output`, or empty if not
    specified.
+ * `onError`: A function that is called whenever an error occurs whil reading a
+   file. This function can simply ignore the error if desired, which causes the
+   URL to be unchanged from the source file. The default function throws the
+   error.
 
 The path to each asset source is determined by the `base` directory and the
 `position.source` property of each node that is set when parsing with

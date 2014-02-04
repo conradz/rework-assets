@@ -155,3 +155,27 @@ test('do not copy data URLs', function(t) {
     t.deepEqual(fs.readdirSync('build'), []);
     t.end();
 });
+
+test('allow onError to ignore errors', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(missing.txt);',
+        '}'
+    ].join('\n');
+
+    var error = null;
+    function onError(err) {
+        error = err;
+    }
+
+    var result = rework(src)
+        .use(assets({ output: 'build', onError: onError }))
+        .toString();
+
+    t.ok(error, 'passed error to onError function');
+    t.equal(result, src);
+    t.deepEqual(fs.readdirSync('build'), []);
+    t.end();
+});

@@ -18,11 +18,12 @@ function assets(options) {
 function process(options, style) {
     var base = path.resolve(options.base || '.'),
         output = path.resolve(options.output || '.'),
-        outputUrl = options.outputUrl || options.output;
+        outputUrl = options.outputUrl || options.output,
+        onError = options.onError || defaultError;
 
     var assets = find(style).filter(relativeUrl);
-    copyAssets(assets, base, output);
-    rewriteAssets(assets, outputUrl);
+    copyAssets(assets, options);
+    rewriteAssets(assets, options);
 }
 
 function node(asset) {
@@ -34,23 +35,36 @@ function relativeUrl(asset) {
     return !u.protocol;
 }
 
-function copyAssets(assets, base, output) {
-    var copied = [];
+function defaultError(err) {
+    throw err;
+}
+
+function copyAssets(assets, options) {
+    var base = path.resolve(options.base || '.'),
+        output = path.resolve(options.output || '.'),
+        onError = options.onError || defaultError,
+        copied = [];
+
     mkdirp.sync(output);
 
     assets.forEach(function(asset) {
         var node = asset.node,
             source = node.position && node.position.source;
 
-        if (source) {
-            source = path.resolve(base, path.dirname(source));
-        } else {
-            source = base;
-        }
-        source = path.join(source, asset.url);
+        source = path.join(
+            (source ? path.resolve(base, path.dirname(source)) : base),
+            asset.url);
 
-        var contents = fs.readFileSync(source),
-            hash = crypto.createHash('sha1')
+        var contents;
+        try {
+            contents = fs.readFileSync(source);
+        } catch (err) {
+            onError(err);
+            asset.dest = null;
+            return;
+        }
+
+        var hash = crypto.createHash('sha1')
                 .update(contents)
                 .digest('hex')
                 .substr(0, 16),
@@ -67,7 +81,8 @@ function copyAssets(assets, base, output) {
     });
 }
 
-function rewriteAssets(assets, outputUrl) {
+function rewriteAssets(assets, options) {
+    var outputUrl = options.outputUrl || options.output || '';
     if (outputUrl) {
         outputUrl += '/';
     }
@@ -83,9 +98,10 @@ function rewriteAssets(assets, outputUrl) {
             converted = '';
 
         refs.forEach(function(asset) {
-            var pos = asset.position;
+            var pos = asset.position,
+                dest = asset.dest ? outputUrl + asset.dest : asset.url;
             converted += value.substring(offset, pos.index);
-            converted += 'url(' + outputUrl + asset.dest + ')';
+            converted += 'url(' + dest + ')';
             offset = pos.index + pos.length;
         });
 
