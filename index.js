@@ -4,7 +4,8 @@ var fs = require('fs'),
     crypto = require('crypto'),
     find = require('css-find-assets'),
     unique = require('mout/array/unique'),
-    contains = require('mout/array/contains');
+    contains = require('mout/array/contains'),
+    url = require('url');
 
 module.exports = assets;
 
@@ -19,13 +20,18 @@ function process(options, style) {
         output = path.resolve(options.output || '.'),
         outputUrl = options.outputUrl || options.output;
 
-    var assets = find(style);
+    var assets = find(style).filter(relativeUrl);
     copyAssets(assets, base, output);
     rewriteAssets(assets, outputUrl);
 }
 
 function node(asset) {
     return asset.node;
+}
+
+function relativeUrl(asset) {
+    var u = url.parse(asset.url);
+    return !u.protocol;
 }
 
 function copyAssets(assets, base, output) {

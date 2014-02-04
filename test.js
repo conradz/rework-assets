@@ -119,3 +119,39 @@ test('use with importing modules', function(t) {
 
     t.end();
 });
+
+test('do not copy absolute URLs', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(http://example.com/test.txt);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({ output: 'build' }))
+        .toString();
+
+    t.equal(result, src);
+    t.deepEqual(fs.readdirSync('build'), []);
+    t.end();
+});
+
+test('do not copy data URLs', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({ output: 'build' }))
+        .toString();
+
+    t.equal(result, src);
+    t.deepEqual(fs.readdirSync('build'), []);
+    t.end();
+});
