@@ -1,0 +1,38 @@
+{
+  "name": "rework-assets",
+  "version": "0.0.0",
+  "description": "Copy all assets referenced to a folder",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conradz/rework-assets.git"
+  },
+  "keywords": [
+    "rework",
+    "css",
+    "assets",
+    "build",
+    "static",
+    "files"
+  ],
+  "author": "Conrad Zimmerman <me@conradz.com>",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/conradz/rework-assets/issues"
+  },
+  "homepage": "https://github.com/conradz/rework-assets",
+  "devDependencies": {
+    "tap": "~0.4.8",
+    "rework": "~0.20.2",
+    "rimraf": "~2.2.6",
+    "rework-npm": "~0.3.0"
+  },
+  "dependencies": {
+    "css-find-assets": "0.0.2",
+    "mkdirp": "~0.3.5",
+    "mout": "~0.9.0"
+  }
+}
