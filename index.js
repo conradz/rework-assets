@@ -36,6 +36,8 @@ function copyAssets(assets, base, output) {
         var node = asset.node,
             source = node.position && node.position.source;
 
+        var contents, hash, dest;
+
         if (source) {
             source = path.resolve(base, path.dirname(source));
         } else {
@@ -43,12 +45,19 @@ function copyAssets(assets, base, output) {
         }
         source = path.join(source, asset.url);
 
-        var contents = fs.readFileSync(source),
+        try {
+            contents = fs.readFileSync(source);
             hash = crypto.createHash('sha1')
                 .update(contents)
                 .digest('hex')
-                .substr(0, 16),
+                .substr(0, 16);
             dest = hash + path.extname(asset.url);
+        }
+        catch (e) {
+            console.error('rework-assets error, missing file:', asset.url);
+            asset.dest = undefined;
+            return;
+        }
 
         if (!contains(copied, dest)) {
             copied.push(dest);
@@ -78,8 +87,9 @@ function rewriteAssets(assets, outputUrl) {
 
         refs.forEach(function(asset) {
             var pos = asset.position;
+            var url = asset.dest ? outputUrl + asset.dest : asset.url;
             converted += value.substring(offset, pos.index);
-            converted += 'url(' + outputUrl + asset.dest + ')';
+            converted += 'url(' + url + ')';
             offset = pos.index + pos.length;
         });
 

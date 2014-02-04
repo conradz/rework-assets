@@ -119,3 +119,19 @@ test('use with importing modules', function(t) {
 
     t.end();
 });
+
+test('skip missing files', function(t) {
+    rimraf.sync('build');
+
+    var result = rework('.test { test: url(fixtures/missing.file); }')
+        .use(assets({ output: 'build' }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(fixtures/missing.file);',
+        '}'
+    ].join('\n'));
+
+    t.end();
+});
