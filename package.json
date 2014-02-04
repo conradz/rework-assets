@@ -31,7 +31,7 @@
     "rework-npm": "~0.3.0"
   },
   "dependencies": {
-    "css-find-assets": "0.0.2",
+    "css-find-assets": "0.0.3",
     "mkdirp": "~0.3.5",
     "mout": "~0.9.0"
   }
