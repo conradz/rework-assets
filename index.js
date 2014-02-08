@@ -16,7 +16,7 @@ function assets(options) {
   options.outputUrl = options.outputUrl || options.output;
   options.onError = options.onError || defaultError;
   options.func = options.func || 'asset';
-  options.prefix = options.prefix || 'assets';
+  options.prefix = options.prefix || '';
 
   return function(style) {
     process(options, style);
@@ -84,7 +84,7 @@ function defaultError(err) {
 
 function copyAssets(assets, options) {
   var copied = [],
-      dest = path.join(options.dest, options.prefix),
+      dest = options.dest,
       src = options.src,
       onError = options.onError;
 
@@ -120,14 +120,15 @@ function copyAssets(assets, options) {
       fs.writeFileSync(destfile, contents);
     }
 
-    asset.url = filename;
+    asset.hashed = filename;
   });
 }
 
 function rewriteAssets(assets, options) {
-  var prefix = options.prefix ? options.prefix + '/' : '';
-
+  var prefix = options.prefix;
+  var func = options.func;
   var nodes = unique(assets.map(node));
+
   nodes.forEach(function(node) {
     var refs = assets.filter(function(a) {
       return a.node === node;
@@ -138,11 +139,17 @@ function rewriteAssets(assets, options) {
       converted = '';
 
     refs.forEach(function(asset) {
-      var pos = asset.position,
-        url = asset.url ? prefix + asset.url : asset.url;
+      var pos = asset.position;
+
       converted += value.substring(offset, pos.index);
-      converted += 'url(' + url + ')';
       offset = pos.index + pos.length;
+
+      if (asset.hashed) {
+        converted += 'url(' + prefix + asset.hashed + ')';
+      }
+      else {
+        converted += func + '(' + asset.url + ')';
+      }
     });
 
     converted += value.substring(offset);
