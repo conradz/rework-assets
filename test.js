@@ -179,3 +179,30 @@ test('allow onError to ignore errors', function(t) {
     t.deepEqual(fs.readdirSync('build'), []);
     t.end();
 });
+
+test('accept a custom function instead of asset()', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(test.txt);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({
+            src: 'fixtures',
+            dest: 'build',
+            func: 'url'
+        }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(' + HASH + '.txt);',
+        '}'
+    ].join('\n'));
+
+    t.end();
+});
+
