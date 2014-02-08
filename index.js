@@ -14,7 +14,7 @@ function assets(options) {
     options.src = path.resolve(options.src || '.');
     options.onError = options.onError || defaultError;
     options.prefix = options.prefix || '';
-    options.func = options.func || 'asset';
+    options.func = options.func || 'url';
 
     return function(style) {
         process(options, style);

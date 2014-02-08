@@ -11,7 +11,7 @@ var HASH = 'a94a8fe5ccb19ba6';
 test('copy asset files to directory', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: asset(test.txt); }')
+    var result = rework('.test { test: url(test.txt); }')
         .use(assets({
             src: 'fixtures',
             dest: 'build'
@@ -34,7 +34,7 @@ test('copy asset files to directory', function(t) {
 test('use different outputUrl', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: asset(test.txt); }')
+    var result = rework('.test { test: url(test.txt); }')
         .use(assets({
             src: 'fixtures',
             dest: 'build',
@@ -58,7 +58,7 @@ test('use different outputUrl', function(t) {
 test('copy assets from nested directory', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: asset(fixtures/test.txt); }')
+    var result = rework('.test { test: url(fixtures/test.txt); }')
         .use(assets({ dest: 'build' }))
         .toString();
 
@@ -80,7 +80,7 @@ test('replace multiple url calls', function(t) {
 
     var src = [
         '.test {',
-        '  test: foo asset(test.txt), asset(test.txt) bar;',
+        '  test: foo url(test.txt), url(test.txt) bar;',
         '}'
     ].join('\n');
 
@@ -125,7 +125,7 @@ test('do not copy absolute URLs', function(t) {
 
     var src = [
         '.test {',
-        '  test: asset(http://example.com/test.txt);',
+        '  test: url(http://example.com/test.txt);',
         '}'
     ].join('\n');
 
@@ -143,7 +143,7 @@ test('do not copy data URLs', function(t) {
 
     var src = [
         '.test {',
-        '  test: asset(data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D);',
+        '  test: url(data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D);',
         '}'
     ].join('\n');
 
@@ -161,7 +161,7 @@ test('allow onError to ignore errors', function(t) {
 
     var src = [
         '.test {',
-        '  test: asset(missing.txt);',
+        '  test: url(missing.txt);',
         '}'
     ].join('\n');
 
@@ -180,12 +180,12 @@ test('allow onError to ignore errors', function(t) {
     t.end();
 });
 
-test('accept a custom function instead of asset()', function(t) {
+test('accept a custom function instead of url()', function(t) {
     rimraf.sync('build');
 
     var src = [
         '.test {',
-        '  test: url(test.txt);',
+        '  test: asset(test.txt);',
         '}'
     ].join('\n');
 
@@ -193,7 +193,7 @@ test('accept a custom function instead of asset()', function(t) {
         .use(assets({
             src: 'fixtures',
             dest: 'build',
-            func: 'url'
+            func: 'asset'
         }))
         .toString();
 

@@ -41,6 +41,11 @@ by the CSS document to a folder. `options` may contain the following values:
    file. This function can simply ignore the error if desired, which causes the
    URL to be unchanged from the source file. The default function throws the
    error.
+ * `func`: The name of the CSS function that references an asset in the input.
+   Defaults to `'url'`. For example, if `func: 'asset'` is specified, all
+   `asset(...)` calls will be found in the input and the copied to the output.
+   The output CSS will always use `url(...)` to reference the copied assets in
+   the build output.
 
 The path to each asset source is determined by the `src` directory and the
 `position.source` property of each node that is set when parsing with
