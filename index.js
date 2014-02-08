@@ -111,8 +111,6 @@ function copyAssets(assets, options) {
         var assetName = hash + path.extname(asset.url),
             destFile = path.join(dest, assetName);
 
-        console.error('copying', destFile, 'to', sourceFile);
-
         if (!contains(copied, hash)) {
             copied.push(hash);
             fs.writeFileSync(destFile, contents);
