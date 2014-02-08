@@ -11,11 +11,12 @@ module.exports = assets;
 function assets(options) {
   options = options || {};
 
-  options.base = path.resolve(options.base || '.');
+  options.src = path.resolve(options.src || '.');
   options.output = path.resolve(options.output || '.');
   options.outputUrl = options.outputUrl || options.output;
   options.onError = options.onError || defaultError;
   options.func = options.func || 'asset';
+  options.prefix = options.prefix || 'assets';
 
   return function(style) {
     process(options, style);
@@ -29,17 +30,19 @@ function process(options, style) {
 }
 
 function find(tree, func) {
-  if (tree.stylesheet) {
-    return find(tree.stylesheet, func);
-  }
+  if (tree.stylesheet) return find(tree.stylesheet, func);
 
   var styles = tree,
-    assets = [];
+      assets = [],
+      // extract the *** from func(***)
+      // for example with func === 'url', url(/foo.png) gives '/foo.png'
+      // with func === 'asset', asset("/bar.png') gives '/bar.png'
+      pattern = new RegExp(func + '\\((\'[^\')+\'|"[^"]+"|[^\\)]+)\\)', 'g');
 
   if (styles.declarations) {
     styles.declarations.forEach(function(d) {
-      var pattern = new RegExp(func + '\((\'[^\')+\'|"[^"]+"|[^\)]+)\)', 'g'),
-        m;
+      var m;
+
       while ((m = pattern.exec(d.value)) !== null) {
         var url = m[1]
           .replace(/^['"]|['"]$/g, '')
@@ -81,23 +84,21 @@ function defaultError(err) {
 
 function copyAssets(assets, options) {
   var copied = [],
-      output = options.output,
-      base = options.base,
+      dest = path.join(options.dest, options.prefix),
+      src = options.src,
       onError = options.onError;
 
-  mkdirp.sync(output);
+  mkdirp.sync(dest);
 
   assets.forEach(function(asset) {
-    var node = asset.node,
-      source = node.position && node.position.source;
-
-    source = path.join(
-      (source ? path.resolve(base, path.dirname(source)) : base),
-      asset.url);
+    var node = asset.node;
+    var source = node.position && node.position.source;
+    var base = source ? path.resolve(src, path.dirname(source)) : src;
+    var sourcefile = path.join(base, asset.url);
 
     var contents;
     try {
-      contents = fs.readFileSync(source);
+      contents = fs.readFileSync(sourcefile);
     } catch (err) {
       onError(err);
       asset.dest = null;
@@ -107,25 +108,24 @@ function copyAssets(assets, options) {
     var hash = crypto.createHash('sha1')
         .update(contents)
         .digest('hex')
-        .substr(0, 16),
-      dest = hash + path.extname(asset.url);
+        .substr(0, 16);
 
-    if (!contains(copied, dest)) {
-      copied.push(dest);
-      fs.writeFileSync(
-        path.join(output, dest),
-        contents);
+    var filename = hash + path.extname(asset.url);
+    var destfile = path.join(dest, filename);
+
+    console.error('copying', sourcefile, 'to', destfile);
+
+    if (!contains(copied, hash)) {
+      copied.push(hash);
+      fs.writeFileSync(destfile, contents);
     }
 
-    asset.dest = dest;
+    asset.url = filename;
   });
 }
 
 function rewriteAssets(assets, options) {
-  var outputUrl = options.outputUrl || options.output || '';
-  if (outputUrl) {
-    outputUrl += '/';
-  }
+  var prefix = options.prefix ? options.prefix + '/' : '';
 
   var nodes = unique(assets.map(node));
   nodes.forEach(function(node) {
@@ -139,9 +139,9 @@ function rewriteAssets(assets, options) {
 
     refs.forEach(function(asset) {
       var pos = asset.position,
-        dest = asset.dest ? outputUrl + asset.dest : asset.url;
+        url = asset.url ? prefix + asset.url : asset.url;
       converted += value.substring(offset, pos.index);
-      converted += 'url(' + dest + ')';
+      converted += 'url(' + url + ')';
       offset = pos.index + pos.length;
     });
 
