@@ -15,8 +15,8 @@ var css = ...;
 
 css = rework(css)
     .use(assets({
-        base: 'src',
-        output: 'assets'
+        src: 'src',
+        dest: 'assets'
     }))
     .toString();
 
@@ -28,21 +28,26 @@ css = rework(css)
 
 ### `assets(options)`
 
-Returns a new rework plugin function that will copy all the assets referenced by the CSS document to a folder. `options` may contain the following values:
+Returns a new rework plugin function that will copy all the assets referenced
+by the CSS document to a folder. `options` may contain the following values:
 
- * `base`: The base folder where the CSS source files are located. Defaults to
+ * `src`: The directory where the CSS source files are located. Defaults to
    the current directory.
- * `output`: The output folder that will contain the copied assets. Defaults to
+ * `dest`: The output folder that will contain the copied assets. Defaults to
    the current directory.
- * `outputUrl`: The URL that is used to reference the output directory from the
-   generated CSS.  Defaults to the value of `output`, or empty if not
-   specified.
+ * `prefix`: The URL that is used to prefix the urls from the
+   generated CSS.  Defaults to empty.
  * `onError`: A function that is called whenever an error occurs whil reading a
    file. This function can simply ignore the error if desired, which causes the
    URL to be unchanged from the source file. The default function throws the
    error.
+ * `func`: The name of the CSS function that references an asset in the input.
+   Defaults to `'url'`. For example, if `func: 'asset'` is specified, all
+   `asset(...)` calls will be found in the input and the copied to the output.
+   The output CSS will always use `url(...)` to reference the copied assets in
+   the build output.
 
-The path to each asset source is determined by the `base` directory and the
+The path to each asset source is determined by the `src` directory and the
 `position.source` property of each node that is set when parsing with
 [css-parse](https://github.com/reworkcss/css-parse) if position tracking is
 enabled (this is the same information used for generating source maps). This
