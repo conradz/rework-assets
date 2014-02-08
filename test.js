@@ -11,16 +11,16 @@ var HASH = 'a94a8fe5ccb19ba6';
 test('copy asset files to directory', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: url(test.txt); }')
+    var result = rework('.test { test: asset(test.txt); }')
         .use(assets({
-            base: 'fixtures',
-            output: 'build'
+            src: 'fixtures',
+            dest: 'build'
         }))
         .toString();
 
     t.equal(result, [
         '.test {',
-        '  test: url(build/' + HASH + '.txt);',
+        '  test: url(' + HASH + '.txt);',
         '}'
     ].join('\n'));
 
@@ -34,11 +34,11 @@ test('copy asset files to directory', function(t) {
 test('use different outputUrl', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: url(test.txt); }')
+    var result = rework('.test { test: asset(test.txt); }')
         .use(assets({
-            base: 'fixtures',
-            output: 'build',
-            outputUrl: 'test'
+            src: 'fixtures',
+            dest: 'build',
+            prefix: 'test/'
         }))
         .toString();
 
@@ -58,13 +58,13 @@ test('use different outputUrl', function(t) {
 test('copy assets from nested directory', function(t) {
     rimraf.sync('build');
 
-    var result = rework('.test { test: url(fixtures/test.txt); }')
-        .use(assets({ output: 'build' }))
+    var result = rework('.test { test: asset(fixtures/test.txt); }')
+        .use(assets({ dest: 'build' }))
         .toString();
 
     t.equal(result, [
         '.test {',
-        '  test: url(build/' + HASH + '.txt);',
+        '  test: url(' + HASH + '.txt);',
         '}'
     ].join('\n'));
 
@@ -80,21 +80,21 @@ test('replace multiple url calls', function(t) {
 
     var src = [
         '.test {',
-        '  test: foo url(test.txt), url(test.txt) bar;',
+        '  test: foo asset(test.txt), asset(test.txt) bar;',
         '}'
     ].join('\n');
 
     var result = rework(src)
         .use(assets({
-            base: 'fixtures',
-            output: 'build'
+            src: 'fixtures',
+            dest: 'build'
         }))
         .toString();
 
     t.equal(result, [
         '.test {',
-        '  test: foo url(build/' + HASH + '.txt), ' +
-            'url(build/' + HASH + '.txt) bar;',
+        '  test: foo url(' + HASH + '.txt), ' +
+            'url(' + HASH + '.txt) bar;',
         '}'
     ].join('\n'));
 
@@ -106,12 +106,12 @@ test('use with importing modules', function(t) {
 
     var result = rework('@import "./fixtures/test.css";')
         .use(reworkNpm())
-        .use(assets({ output: 'build' }))
+        .use(assets({ dest: 'build' }))
         .toString();
 
     t.equal(result, [
         '.test {',
-        '  test: url(build/' + HASH + '.txt);',
+        '  test: url(' + HASH + '.txt);',
         '}'
     ].join('\n'));
 
@@ -125,12 +125,12 @@ test('do not copy absolute URLs', function(t) {
 
     var src = [
         '.test {',
-        '  test: url(http://example.com/test.txt);',
+        '  test: asset(http://example.com/test.txt);',
         '}'
     ].join('\n');
 
     var result = rework(src)
-        .use(assets({ output: 'build' }))
+        .use(assets({ dest: 'build' }))
         .toString();
 
     t.equal(result, src);
@@ -143,12 +143,12 @@ test('do not copy data URLs', function(t) {
 
     var src = [
         '.test {',
-        '  test: url(data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D);',
+        '  test: asset(data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D);',
         '}'
     ].join('\n');
 
     var result = rework(src)
-        .use(assets({ output: 'build' }))
+        .use(assets({ dest: 'build' }))
         .toString();
 
     t.equal(result, src);
@@ -161,7 +161,7 @@ test('allow onError to ignore errors', function(t) {
 
     var src = [
         '.test {',
-        '  test: url(missing.txt);',
+        '  test: asset(missing.txt);',
         '}'
     ].join('\n');
 
@@ -171,7 +171,7 @@ test('allow onError to ignore errors', function(t) {
     }
 
     var result = rework(src)
-        .use(assets({ output: 'build', onError: onError }))
+        .use(assets({ dest: 'build', onError: onError }))
         .toString();
 
     t.ok(error, 'passed error to onError function');
@@ -179,3 +179,30 @@ test('allow onError to ignore errors', function(t) {
     t.deepEqual(fs.readdirSync('build'), []);
     t.end();
 });
+
+test('accept a custom function instead of asset()', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(test.txt);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({
+            src: 'fixtures',
+            dest: 'build',
+            func: 'url'
+        }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(' + HASH + '.txt);',
+        '}'
+    ].join('\n'));
+
+    t.end();
+});
+

@@ -1,6 +1,6 @@
 {
   "name": "rework-assets",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Copy all assets referenced to a folder",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,6 @@
     "rework-npm": "~0.3.0"
   },
   "dependencies": {
-    "css-find-assets": "0.0.3",
     "mkdirp": "~0.3.5",
     "mout": "~0.9.0"
   }
