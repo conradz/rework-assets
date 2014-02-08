@@ -60,7 +60,7 @@ source extension appended. This allows multiple files to reference assets with
 the same name but different path. It also deduplicates files originating from
 multiple sources but containing the same content.
 
-## Example complete `build-css` script
+## Example `build-css` script
 
 ```js
 #!/usr/bin/env node
