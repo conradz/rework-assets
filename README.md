@@ -28,7 +28,8 @@ css = rework(css)
 
 ### `assets(options)`
 
-Returns a new rework plugin function that will copy all the assets referenced by the CSS document to a folder. `options` may contain the following values:
+Returns a new rework plugin function that will copy all the assets referenced
+by the CSS document to a folder. `options` may contain the following values:
 
  * `src`: The directory where the CSS source files are located. Defaults to
    the current directory.

@@ -89,14 +89,14 @@ function copyAssets(assets, options) {
     mkdirp.sync(dest);
 
     assets.forEach(function(asset) {
-        var node = asset.node;
-        var source = node.position && node.position.source;
-        var base = source ? path.resolve(src, path.dirname(source)) : src;
-        var sourcefile = path.join(base, asset.url);
+        var node = asset.node,
+            source = node.position && node.position.source,
+            base = source ? path.resolve(src, path.dirname(source)) : src,
+            sourceFile = path.join(base, asset.url);
 
         var contents;
         try {
-            contents = fs.readFileSync(sourcefile);
+            contents = fs.readFileSync(sourceFile);
         } catch (err) {
             onError(err);
             asset.dest = null;
@@ -104,28 +104,28 @@ function copyAssets(assets, options) {
         }
 
         var hash = crypto.createHash('sha1')
-                .update(contents)
-                .digest('hex')
-                .substr(0, 16);
+            .update(contents)
+            .digest('hex')
+            .substr(0, 16);
 
-        var filename = hash + path.extname(asset.url);
-        var destfile = path.join(dest, filename);
+        var assetName = hash + path.extname(asset.url),
+            destFile = path.join(dest, assetName);
 
-        console.error('copying', sourcefile, 'to', destfile);
+        console.error('copying', destFile, 'to', sourceFile);
 
         if (!contains(copied, hash)) {
             copied.push(hash);
-            fs.writeFileSync(destfile, contents);
+            fs.writeFileSync(destFile, contents);
         }
 
-        asset.hashed = filename;
+        asset.hashed = assetName;
     });
 }
 
 function rewriteAssets(assets, options) {
-    var prefix = options.prefix;
-    var func = options.func;
-    var nodes = unique(assets.map(node));
+    var prefix = options.prefix,
+        func = options.func,
+        nodes = unique(assets.map(node));
 
     nodes.forEach(function(node) {
         var refs = assets.filter(function(a) {
