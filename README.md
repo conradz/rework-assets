@@ -9,16 +9,16 @@ references.
 
 ```js
 var rework = require('rework'),
-        assets = require('rework-assets');
+    assets = require('rework-assets');
 
 var css = ...;
 
 css = rework(css)
-        .use(assets({
-                src: 'src',
-                dest: 'assets'
-        }))
-        .toString();
+    .use(assets({
+        src: 'src',
+        dest: 'assets'
+    }))
+    .toString();
 
 // all assets are copied to the `assets` folder, which is referenced by all
 // `url(...)` calls in the generated CSS
