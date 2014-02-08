@@ -12,11 +12,9 @@ function assets(options) {
   options = options || {};
 
   options.src = path.resolve(options.src || '.');
-  options.output = path.resolve(options.output || '.');
-  options.outputUrl = options.outputUrl || options.output;
   options.onError = options.onError || defaultError;
-  options.func = options.func || 'asset';
   options.prefix = options.prefix || '';
+  options.func = options.func || 'asset';
 
   return function(style) {
     process(options, style);
