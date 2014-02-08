@@ -142,14 +142,11 @@ function rewriteAssets(assets, options) {
       var pos = asset.position;
 
       converted += value.substring(offset, pos.index);
-      offset = pos.index + pos.length;
+      converted += asset.hashed
+        ? 'url(' + prefix + asset.hashed + ')'
+        : func + '(' + asset.url + ')';
 
-      if (asset.hashed) {
-        converted += 'url(' + prefix + asset.hashed + ')';
-      }
-      else {
-        converted += func + '(' + asset.url + ')';
-      }
+      offset = pos.index + pos.length;
     });
 
     converted += value.substring(offset);
