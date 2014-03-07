@@ -2,105 +2,48 @@ var fs = require('fs'),
     path = require('path'),
     mkdirp = require('mkdirp'),
     crypto = require('crypto'),
-    unique = require('mout/array/unique'),
-    contains = require('mout/array/contains'),
-    url = require('url');
+    url = require('url'),
+    reworkFunction = require('rework-plugin-function');
 
 module.exports = assets;
 
 function assets(options) {
     options = options || {};
+    var srcDir = path.resolve(options.src || '.');
+    var destDir = options.dest;
+    var fnName = options.func || 'url';
+    var onError = options.onError || defaultError;
+    var prefix = options.prefix || '';
+    var processed = {};
 
-    options.src = path.resolve(options.src || '.');
-    options.onError = options.onError || defaultError;
-    options.prefix = options.prefix || '';
-    options.func = options.func || 'url';
+    var fn = {};
+    fn[fnName] = process;
+    return reworkFunction(fn, false);
 
-    return function(style) {
-        process(options, style);
-    };
-}
+    function process(asset) {
+        var u = url.parse(asset);
+        if (u.protocol) {
+            return original(asset);
+        }
 
-function process(options, style) {
-    var assets = find(style, options.func).filter(relativeUrl);
-    copyAssets(assets, options);
-    rewriteAssets(assets, options);
-}
+        asset = u.pathname;
 
-function find(tree, func) {
-    if (tree.stylesheet) return find(tree.stylesheet, func);
+        var source = this.position && this.position.source;
+        var baseDir = source
+            ? path.resolve(srcDir, path.dirname(source))
+            : srcDir;
 
-    var styles = tree,
-        assets = [],
-        // extract the *** from func(***)
-        // for example with func === 'url', url(/foo.png) gives '/foo.png'
-        // with func === 'asset', asset("/bar.png') gives '/bar.png'
-        pattern = new RegExp(func + '\\((\'[^\')+\'|"[^"]+"|[^\\)]+)\\)', 'g');
-
-    if (styles.declarations) {
-        styles.declarations.forEach(function(d) {
-            var m;
-
-            while ((m = pattern.exec(d.value)) !== null) {
-                var url = m[1]
-                    .replace(/^['"]|['"]$/g, '')
-                    .replace(/[?#].*$/, '');
-
-                assets.push({
-                    url: url,
-                    node: d,
-                    position: {
-                        index: m.index,
-                        length: m[0].length
-                    }
-                });
-            }
-        });
-    }
-
-    if (styles.rules) {
-        styles.rules.forEach(function(rule) {
-            assets = assets.concat(find(rule, func));
-        });
-    }
-
-    return assets;
-}
-
-function node(asset) {
-    return asset.node;
-}
-
-function relativeUrl(asset) {
-    var u = url.parse(asset.url);
-    return !u.protocol;
-}
-
-function defaultError(err) {
-    throw err;
-}
-
-function copyAssets(assets, options) {
-    var copied = [],
-        dest = options.dest,
-        src = options.src,
-        onError = options.onError;
-
-    mkdirp.sync(dest);
-
-    assets.forEach(function(asset) {
-        var node = asset.node,
-            source = node.position && node.position.source,
-            base = source ? path.resolve(src, path.dirname(source)) : src,
-            sourceFile = path.join(base, asset.url);
+        var srcFile = path.join(baseDir, asset);
+        if (hasOwn(processed, srcFile)) {
+            return destUrl(processed[srcFile], u);
+        }
 
         var contents;
         try {
-            contents = fs.readFileSync(sourceFile);
+            contents = fs.readFileSync(srcFile);
         } catch (err) {
             onError(err);
-            asset.dest = null;
-            return;
+            return original(asset);
         }
 
         var hash = crypto.createHash('sha1')
@@ -108,44 +51,30 @@ function copyAssets(assets, options) {
             .digest('hex')
             .substr(0, 16);
 
-        var assetName = hash + path.extname(asset.url),
-            destFile = path.join(dest, assetName);
+        var name = hash + path.extname(asset);
+        var destFile = path.join(destDir, name);
+        mkdirp.sync(destDir);
+        fs.writeFileSync(destFile, contents);
 
-        if (!contains(copied, hash)) {
-            copied.push(hash);
-            fs.writeFileSync(destFile, contents);
-        }
+        processed[srcFile] = name;
+        return destUrl(name, u);
+    }
 
-        asset.hashed = assetName;
-    });
+    function original(asset) {
+        return fnName + '(' + asset + ')';
+    }
+
+    function destUrl(name, url) {
+        if (url.search) name += url.search;
+        if (url.hash) name += url.hash;
+        return 'url(' + prefix + name + ')';
+    }
 }
 
-function rewriteAssets(assets, options) {
-    var prefix = options.prefix,
-        func = options.func,
-        nodes = unique(assets.map(node));
+function defaultError(err) {
+    throw err;
+}
 
-    nodes.forEach(function(node) {
-        var refs = assets.filter(function(a) {
-            return a.node === node;
-        });
-
-        var offset = 0,
-            value = node.value,
-            converted = '';
-
-        refs.forEach(function(asset) {
-            var pos = asset.position;
-
-            converted += value.substring(offset, pos.index);
-            converted += asset.hashed
-                ? 'url(' + prefix + asset.hashed + ')'
-                : func + '(' + asset.url + ')';
-
-            offset = pos.index + pos.length;
-        });
-
-        converted += value.substring(offset);
-        node.value = converted;
-    });
+function hasOwn(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
 }

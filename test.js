@@ -134,7 +134,7 @@ test('do not copy absolute URLs', function(t) {
         .toString();
 
     t.equal(result, src);
-    t.deepEqual(fs.readdirSync('build'), []);
+    t.notOk(fs.existsSync('build'));
     t.end();
 });
 
@@ -152,7 +152,7 @@ test('do not copy data URLs', function(t) {
         .toString();
 
     t.equal(result, src);
-    t.deepEqual(fs.readdirSync('build'), []);
+    t.notOk(fs.existsSync('build'));
     t.end();
 });
 
@@ -176,7 +176,7 @@ test('allow onError to ignore errors', function(t) {
 
     t.ok(error, 'passed error to onError function');
     t.equal(result, src);
-    t.deepEqual(fs.readdirSync('build'), []);
+    t.notOk(fs.existsSync('build'));
     t.end();
 });
 
@@ -206,3 +206,24 @@ test('accept a custom function instead of url()', function(t) {
     t.end();
 });
 
+test('persist url parameters in assets', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(test.txt?test#hash);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({ src: 'fixtures', dest: 'build' }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(' + HASH + '.txt?test#hash);',
+        '}'
+    ].join('\n'));
+
+    t.end();
+});

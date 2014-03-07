@@ -32,6 +32,6 @@
   },
   "dependencies": {
     "mkdirp": "~0.3.5",
-    "mout": "~0.9.0"
+    "rework-plugin-function": "^0.1.3"
   }
 }
