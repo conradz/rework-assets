@@ -22,7 +22,7 @@ function assets(options) {
 
     function process(asset) {
         var u = url.parse(asset);
-        if (u.protocol) {
+        if (u.protocol || !u.pathname) {
             return original(asset);
         }
 
