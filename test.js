@@ -156,6 +156,24 @@ test('do not copy data URLs', function(t) {
     t.end();
 });
 
+test('do not copy files with no url', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url(#test);',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({ dest: 'build' }))
+        .toString();
+
+    t.equal(result, src);
+    t.notOk(fs.existsSync('build'));
+    t.end();
+})
+
 test('allow onError to ignore errors', function(t) {
     rimraf.sync('build');
 
