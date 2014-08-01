@@ -37,6 +37,9 @@ by the CSS document to a folder. `options` may contain the following values:
    the current directory.
  * `prefix`: The URL that is used to prefix the urls from the generated CSS.
    Defaults to empty.
+ * `retainName`: Append hash to the original asset name to make identification easier,
+   rather than naming solely based on hash.
+   Defaults to true.
  * `onError`: A function that is called whenever an error occurs whil reading a
    file. This function can simply ignore the error if desired, which causes the
    URL to be unchanged from the source file. The default function throws the

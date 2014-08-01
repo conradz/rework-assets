@@ -14,6 +14,7 @@ function assets(options) {
     var fnName = options.func || 'url';
     var onError = options.onError || defaultError;
     var prefix = options.prefix || '';
+    var retainName = typeof options.retainName !== 'undefined' ? options.retainName : true;
     var processed = {};
 
     var fn = {};
@@ -51,7 +52,10 @@ function assets(options) {
             .digest('hex')
             .substr(0, 16);
 
-        var name = hash + path.extname(asset);
+
+        var ext = path.extname(asset);
+        var origName = path.basename(asset, ext);
+        var name = name = (retainName ? origName + '-' : '') + hash + ext;
         var destFile = path.join(destDir, name);
         mkdirp.sync(destDir);
         fs.writeFileSync(destFile, contents);
