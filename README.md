@@ -1,6 +1,6 @@
 # rework-assets
 
-[![Build Status](https://drone.io/github.com/conradz/rework-assets/status.png)](https://drone.io/github.com/conradz/rework-assets/latest)
+[![Build Status](https://travis-ci.org/conradz/rework-assets.svg?branch=master)](https://travis-ci.org/conradz/rework-assets)
 
 Copy all assets referenced by the CSS document to a folder, updating the CSS
 references.
