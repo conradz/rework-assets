@@ -6,7 +6,8 @@ var test = require('tap').test,
     assets = require('./');
 
 // Hash of the fixtures/test.txt file
-var HASH = 'a94a8fe5ccb19ba6';
+var HASH = 'test-a94a8fe5ccb19ba6';
+var SHORT_HASH = 'a94a8fe5ccb19ba6';
 
 test('copy asset files to directory', function(t) {
     rimraf.sync('build');
@@ -26,6 +27,30 @@ test('copy asset files to directory', function(t) {
 
     t.ok(
         fs.existsSync('build/' + HASH + '.txt'),
+        'copied file');
+
+    t.end();
+});
+
+test('options.retainName', function(t) {
+    rimraf.sync('build');
+
+    var result = rework('.test { test: url(test.txt); }')
+        .use(assets({
+            src: 'fixtures',
+            dest: 'build',
+            retainName: false
+        }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(' + SHORT_HASH + '.txt);',
+        '}'
+    ].join('\n'));
+
+    t.ok(
+        fs.existsSync('build/' + SHORT_HASH + '.txt'),
         'copied file');
 
     t.end();
