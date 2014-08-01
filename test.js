@@ -197,7 +197,7 @@ test('do not copy files with no url', function(t) {
     t.equal(result, src);
     t.notOk(fs.existsSync('build'));
     t.end();
-})
+});
 
 test('allow onError to ignore errors', function(t) {
     rimraf.sync('build');

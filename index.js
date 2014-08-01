@@ -14,14 +14,16 @@ function assets(options) {
     var fnName = options.func || 'url';
     var onError = options.onError || defaultError;
     var prefix = options.prefix || '';
-    var retainName = typeof options.retainName !== 'undefined' ? options.retainName : true;
+    var retainName = typeof options.retainName !== 'undefined'
+        ? options.retainName
+        : true;
     var processed = {};
 
     var fn = {};
-    fn[fnName] = process;
+    fn[fnName] = processAsset;
     return reworkFunction(fn, false);
 
-    function process(asset) {
+    function processAsset(asset) {
         var u = url.parse(asset);
         if (u.protocol || !u.pathname) {
             return original(asset);
@@ -55,7 +57,7 @@ function assets(options) {
 
         var ext = path.extname(asset);
         var origName = path.basename(asset, ext);
-        var name = name = (retainName ? origName + '-' : '') + hash + ext;
+        var name = (retainName ? origName + '-' : '') + hash + ext;
         var destFile = path.join(destDir, name);
         mkdirp.sync(destDir);
         fs.writeFileSync(destFile, contents);

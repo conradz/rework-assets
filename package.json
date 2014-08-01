@@ -4,7 +4,7 @@
   "description": "Copy all assets referenced to a folder",
   "main": "index.js",
   "scripts": {
-    "test": "tap test.js"
+    "test": "jshint *.js && tap test.js"
   },
   "repository": {
     "type": "git",
@@ -25,10 +25,11 @@
   },
   "homepage": "https://github.com/conradz/rework-assets",
   "devDependencies": {
-    "tap": "^0.4.12",
+    "jshint": "^2.5.2",
     "rework": "^1.0.0",
+    "rework-npm": "^1.0.0",
     "rimraf": "^2.2.8",
-    "rework-npm": "^1.0.0"
+    "tap": "^0.4.12"
   },
   "dependencies": {
     "mkdirp": "^0.5.0",

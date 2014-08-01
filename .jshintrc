@@ -1,0 +1,10 @@
+{
+    "eqeqeq": true,
+    "indent": 4,
+    "latedef": "nofunc",
+    "quotmark": "single",
+    "undef": true,
+    "unused": true,
+    "laxbreak": true,
+    "node": true
+}
