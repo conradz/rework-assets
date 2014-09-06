@@ -6,6 +6,7 @@ var fs = require('fs'),
     reworkFunction = require('rework-plugin-function');
 
 module.exports = assets;
+assets.args = { assetpaths: [] };
 
 function assets(options) {
     options = options || {};
@@ -37,6 +38,7 @@ function assets(options) {
             : srcDir;
 
         var srcFile = path.join(baseDir, asset);
+        assets.args.assetpaths.push(srcFile);
         if (hasOwn(processed, srcFile)) {
             return destUrl(processed[srcFile], u);
         }
