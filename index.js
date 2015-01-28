@@ -6,11 +6,11 @@ var fs = require('fs'),
     reworkFunction = require('rework-plugin-function');
 
 module.exports = assets;
-assets.args = { assetpaths: [] };
 
 function assets(options) {
     options = options || {};
     var srcDir = path.resolve(options.src || '.');
+    var onFile = options.onFile;
     var destDir = options.dest;
     var fnName = options.func || 'url';
     var onError = options.onError || defaultError;
@@ -38,7 +38,7 @@ function assets(options) {
             : srcDir;
 
         var srcFile = path.join(baseDir, asset);
-        assets.args.assetpaths.push(srcFile);
+        if (onFile) { onFile(srcFile); }
         if (hasOwn(processed, srcFile)) {
             return destUrl(processed[srcFile], u);
         }
