@@ -10,6 +10,7 @@ module.exports = assets;
 function assets(options) {
     options = options || {};
     var srcDir = path.resolve(options.src || '.');
+    var onFile = options.onFile;
     var destDir = options.dest;
     var fnName = options.func || 'url';
     var onError = options.onError || defaultError;
@@ -37,6 +38,7 @@ function assets(options) {
             : srcDir;
 
         var srcFile = path.join(baseDir, asset);
+        if (onFile) { onFile(srcFile); }
         if (hasOwn(processed, srcFile)) {
             return destUrl(processed[srcFile], u);
         }
