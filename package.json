@@ -26,11 +26,11 @@
   },
   "homepage": "https://github.com/conradz/rework-assets",
   "devDependencies": {
-    "jshint": "^2.5.2",
+    "jshint": "^2.6.0",
     "rework": "^1.0.0",
     "rework-npm": "^1.0.0",
     "rimraf": "^2.2.8",
-    "tap": "^0.4.12"
+    "tap": "^0.5.0"
   },
   "dependencies": {
     "mkdirp": "^0.5.0",
