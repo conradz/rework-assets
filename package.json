@@ -4,7 +4,8 @@
   "description": "Copy all assets referenced to a folder",
   "main": "index.js",
   "scripts": {
-    "test": "jshint *.js && tap test.js"
+    "pretest": "jshint .",
+    "test": "tap test.js"
   },
   "repository": {
     "type": "git",
