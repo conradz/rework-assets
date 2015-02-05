@@ -44,6 +44,9 @@ by the CSS document to a folder. `options` may contain the following values:
    file. This function can simply ignore the error if desired, which causes the
    URL to be unchanged from the source file. The default function throws the
    error.
+ * `onFile`: A function that is called whenever a file is included. It is called
+   with the file path. This can be used for tracking which files are referenced
+   from the stylesheet.
  * `func`: The name of the CSS function that references an asset in the input.
    Defaults to `'url'`. For example, if `func: 'asset'` is specified, all
    `asset(...)` calls will be found in the input and the copied to the output.
