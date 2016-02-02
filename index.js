@@ -69,7 +69,7 @@ function assets(options) {
     }
 
     function original(asset) {
-        return fnName + '(' + asset + ')';
+        return fnName + '(\'' + asset + '\')';
     }
 
     function destUrl(name, url) {
