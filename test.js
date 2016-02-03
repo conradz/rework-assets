@@ -158,8 +158,14 @@ test('do not copy absolute URLs', function(t) {
         .use(assets({ dest: 'build' }))
         .toString();
 
-    t.equal(result, src);
+    t.equal(result, [
+        '.test {',
+        '  test: url(\'http://example.com/test.txt\');',
+        '}'
+    ].join('\n'));
+
     t.notOk(fs.existsSync('build'));
+
     t.end();
 });
 
@@ -176,8 +182,14 @@ test('do not copy data URLs', function(t) {
         .use(assets({ dest: 'build' }))
         .toString();
 
-    t.equal(result, src);
+    t.equal(result, [
+        '.test {',
+        '  test: url(\'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D\');',
+        '}'
+    ].join('\n'));
+
     t.notOk(fs.existsSync('build'));
+
     t.end();
 });
 
@@ -194,8 +206,14 @@ test('do not copy files with no url', function(t) {
         .use(assets({ dest: 'build' }))
         .toString();
 
-    t.equal(result, src);
+    t.equal(result, [
+        '.test {',
+        '  test: url(\'#test\');',
+        '}'
+    ].join('\n'));
+
     t.notOk(fs.existsSync('build'));
+
     t.end();
 });
 
@@ -218,8 +236,38 @@ test('allow onError to ignore errors', function(t) {
         .toString();
 
     t.ok(error, 'passed error to onError function');
-    t.equal(result, src);
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(\'missing.txt\');',
+        '}'
+    ].join('\n'));
+
     t.notOk(fs.existsSync('build'));
+    t.end();
+});
+
+test('handle unchanged urls with quotes', function(t) {
+    rimraf.sync('build');
+
+    var src = [
+        '.test {',
+        '  test: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'10\'></svg>");',
+        '}'
+    ].join('\n');
+
+    var result = rework(src)
+        .use(assets({ dest: 'build' }))
+        .toString();
+
+    t.equal(result, [
+        '.test {',
+        '  test: url(\'data:image/svg+xml;utf8,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'10\\\' height=\\\'10\\\'></svg>\');',
+        '}'
+    ].join('\n'));
+
+    t.notOk(fs.existsSync('build'));
+
     t.end();
 });
 
