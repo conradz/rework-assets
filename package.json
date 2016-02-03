@@ -20,7 +20,7 @@
     "files"
   ],
   "author": "Conrad Zimmerman <me@conradz.com>",
-  "license": "BSD",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/conradz/rework-assets/issues"
   },
